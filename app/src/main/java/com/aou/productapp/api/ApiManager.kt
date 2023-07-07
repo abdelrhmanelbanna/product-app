@@ -1,0 +1,46 @@
+package com.aou.productapp.api
+
+import android.util.Log
+import okhttp3.OkHttpClient
+import okhttp3.logging.HttpLoggingInterceptor
+import retrofit2.Retrofit
+import retrofit2.converter.gson.GsonConverterFactory
+
+class ApiManager {
+
+
+    companion object {
+        private var retrofit: Retrofit? = null
+
+        private fun getInstance(): Retrofit {
+
+            if (retrofit == null) {
+
+                // logging Interceptor
+                val logging = HttpLoggingInterceptor { message ->
+
+                    Log.e("api", message)
+                }
+                logging.setLevel(HttpLoggingInterceptor.Level.BODY)
+                val client = OkHttpClient.Builder()
+                    .addInterceptor(logging)
+                    .build()
+
+                retrofit = Retrofit.Builder()
+                    .client(client)
+                    .baseUrl("https://dummyjson.com/")
+                    .addConverterFactory(GsonConverterFactory.create())
+                    .build()
+
+            }
+
+            return retrofit!!;
+        }
+
+        fun getApis(): WebServices {
+            return getInstance().create(WebServices::class.java)
+        }
+
+    }
+
+}
